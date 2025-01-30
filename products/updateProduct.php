@@ -1,0 +1,32 @@
+<?php
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: PUT, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (!empty($data['id']) && !empty($data['name']) && !empty($data['category']) && !empty($data['price']) && !empty($data['status'])) {
+    try {
+        // Database connection
+        $conn = new PDO("mysql:host=localhost;dbname=dukani", "root", "");
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Execute the query
+        $stmt = $conn->prepare("UPDATE products SET name = :name, category = :category, price = :price, description = :description, status = :status WHERE id = :id");
+        $stmt->bindParam(':id', $data['id']);
+        $stmt->bindParam(':name', $data['name']);
+        $stmt->bindParam(':category', $data['category']);
+        $stmt->bindParam(':price', $data['price']);
+        $stmt->bindParam(':description', $data['description']);
+        $stmt->bindParam(':status', $data['status']);
+        $stmt->execute();
+
+        echo json_encode(['success' => true, 'message' => 'Product updated successfully']);
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+} else {
+    echo json_encode(['success' => false, 'error' => 'Invalid input']);
+}
+?>
