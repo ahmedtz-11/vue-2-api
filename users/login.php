@@ -29,7 +29,13 @@ if (isset($data['username'], $data['password'])) {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         if (password_verify($password, $user['password'])) {
-            echo json_encode(['success' => true, 'message' => 'Login successful']);
+            // Return success along with user ID and username
+            echo json_encode([
+                'success' => true,
+                'message' => 'Login successful',
+                'id' => $user['id'],  // Add user ID to the response
+                'username' => $user['username']  // Include the username as well
+            ]);
         } else {
             echo json_encode(['error' => 'Invalid username or password']);
         }
