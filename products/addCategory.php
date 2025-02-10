@@ -6,13 +6,14 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (!empty($data['category'])) {
+if (!empty($data['category']) && !empty($data['status'])) {
     try {
         $conn = new PDO("mysql:host=localhost;dbname=dukani", "root", "");
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $stmt = $conn->prepare("INSERT INTO categories (category) VALUES (:category)");
-        $stmt->bindParam(':category', $data['category']);
+        $stmt = $conn->prepare("INSERT INTO categories (name, status) VALUES (:category, :status)");
+        $stmt->bindParam(':name', $data['name']);
+        $stmt->bindParam(':status', $data['status']);
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'New category added!']);
