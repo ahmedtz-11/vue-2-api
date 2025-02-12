@@ -16,12 +16,24 @@ try {
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (isset($data['id'], $data['username'], $data['role'], $data['status'])) {
+
+    // Get the status ID from user_status table
+    $stmt = $pdo->prepare("SELECT id FROM user_status WHERE name = :status");
+    $stmt->bindParam(':status', $data['status']);
+    $stmt->execute();
+    $status_id = $stmt->fetchColumn();
+
+    if (!$status_id) {
+        echo json_encode(['success' => false, 'error' => 'Invalid status']);
+        exit;
+    }
+
     //Execute SQL query
     $query = "UPDATE users SET username = :username, role = :role, status = :status WHERE id = :id";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':username', $data['username']);
     $stmt->bindParam(':role', $data['role']);
-    $stmt->bindParam(':status', $data['status']);
+    $stmt->bindParam(':status', $status_id);
     $stmt->bindParam(':id', $data['id']);
     
     if ($stmt->execute()) {

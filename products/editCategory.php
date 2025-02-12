@@ -12,11 +12,22 @@ if (!empty($data['id']) && !empty($data['name']) && !empty($data['status'])) {
         $conn = new PDO("mysql:host=localhost;dbname=dukani", "root", "");
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        // Get the status ID from category_status table
+        $stmt = $conn->prepare("SELECT id FROM category_status WHERE name = :status");
+        $stmt->bindParam(':status', $data['status']);
+        $stmt->execute();
+        $status_id = $stmt->fetchColumn();
+
+        if (!$status_id) {
+            echo json_encode(['success' => false, 'error' => 'Invalid status']);
+            exit;
+        }
+
         // Execute the query
         $stmt = $conn->prepare("UPDATE categories SET name = :name, status = :status WHERE id = :id");
         $stmt->bindParam(':id', $data['id']);
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':status', $data['status']);
+        $stmt->bindParam(':status', $status_id );
         $stmt->execute();
 
         echo json_encode(['success' => true, 'message' => 'Category has been updated!']);

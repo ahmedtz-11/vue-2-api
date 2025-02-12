@@ -17,13 +17,25 @@ try {
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (isset($data['username'], $data['password'], $data['role'], $data['status'])) {
+
+    // Get the status ID from user_status table
+    $stmt = $pdo->prepare("SELECT id FROM user_status WHERE name = :status");
+    $stmt->bindParam(':status', $data['status']);
+    $stmt->execute();
+    $status_id = $stmt->fetchColumn();
+
+    if (!$status_id) {
+        echo json_encode(['success' => false, 'error' => 'Invalid status']);
+        exit;
+    }
+
     //Execute SQL query
     $query = "INSERT INTO users (username, password, role, status) VALUES (:username, :password, :role, :status)";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':username', $data['username']);
     $stmt->bindParam(':password', password_hash($data['password'], PASSWORD_BCRYPT));
     $stmt->bindParam(':role', $data['role']);
-    $stmt->bindParam(':status', $data['status']);
+    $stmt->bindParam(':status', $status_id);
     
     if ($stmt->execute()) {
         // JSON success when user created
