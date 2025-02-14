@@ -53,24 +53,53 @@ try {
     }
 
     // Insert into `sales_transactions`
-    $stmt = $conn->prepare("INSERT INTO sales_transactions (total_amount, payment_method, payment_status, sold_by) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO sales_transactions (total_amount, payment_method_id, payment_status_id, sold_by_id) VALUES (?, ?, ?, ?)");
     $stmt->execute([$total_amount, $payment_method_id, $payment_status_id, $sold_by_id]);
     $transaction_id = $conn->lastInsertId();
 
-    // Insert into `sales_details`
+    // Insert into `sales_details` and deduct stock
     $stmt = $conn->prepare("INSERT INTO sales_details (transaction_id, product_id, quantity, unit_price, total_price) VALUES (?, ?, ?, ?, ?)");
+    
     foreach ($sales_details as $detail) {
-        $stmt->execute([
-            $transaction_id,
-            $detail['product_id'],
-            $detail['quantity'],
-            $detail['unit_price'],
-            $detail['quantity'] * $detail['unit_price']
-        ]);
+        $product_id = $detail['product_id'];
+        $quantity_sold = $detail['quantity'];
+        $unit_price = $detail['unit_price'];
+        $total_price = $quantity_sold * $unit_price;
+
+        // Insert into sales_details
+        $stmt->execute([$transaction_id, $product_id, $quantity_sold, $unit_price, $total_price]);
+
+        // Deduct from stock (earliest expiry first)
+        $remaining_quantity = $quantity_sold;
+
+        $stock_stmt = $conn->prepare("SELECT id, quantity FROM stocks WHERE product_id = ? AND quantity > 0 ORDER BY expiry_date ASC");
+        $stock_stmt->execute([$product_id]);
+        $stocks = $stock_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($stocks as $stock) {
+            if ($remaining_quantity <= 0) {
+                break;
+            }
+
+            $stock_id = $stock['id'];
+            $available_quantity = $stock['quantity'];
+
+            if ($available_quantity >= $remaining_quantity) {
+                // Deduct and update stock
+                $update_stmt = $conn->prepare("UPDATE stocks SET quantity = quantity - ? WHERE id = ?");
+                $update_stmt->execute([$remaining_quantity, $stock_id]);
+                $remaining_quantity = 0;
+            } else {
+                // Deplete this stock entry and move to the next
+                $update_stmt = $conn->prepare("UPDATE stocks SET quantity = 0 WHERE id = ?");
+                $update_stmt->execute([$stock_id]);
+                $remaining_quantity -= $available_quantity;
+            }
+        }
     }
 
     $conn->commit();
-    echo json_encode(['success' => true, 'message' => 'Transaction created successfully']);
+    echo json_encode(['success' => true, 'message' => 'Transaction completed, stock updated']);
 } catch (Exception $e) {
     $conn->rollBack();
     http_response_code(500);

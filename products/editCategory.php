@@ -24,10 +24,10 @@ if (!empty($data['id']) && !empty($data['name']) && !empty($data['status'])) {
         }
 
         // Execute the query
-        $stmt = $conn->prepare("UPDATE categories SET name = :name, status = :status WHERE id = :id");
+        $stmt = $conn->prepare("UPDATE categories SET name = :name, status_id = :status_id WHERE id = :id");
         $stmt->bindParam(':id', $data['id']);
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':status', $status_id );
+        $stmt->bindParam(':status_id', $status_id);
         $stmt->execute();
 
         echo json_encode(['success' => true, 'message' => 'Category has been updated!']);

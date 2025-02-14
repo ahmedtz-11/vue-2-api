@@ -49,14 +49,14 @@ if (!empty($data['id']) && !empty($data['product_name']) && !empty($data['quanti
         }
 
         // Execute the update query
-        $stmt = $conn->prepare("UPDATE stocks SET product_name = :product_name, quantity = :quantity, purchasing_price = :purchasing_price, expiry_date = :expiry_date, added_by = :added_by, status = :status WHERE id = :id");
+        $stmt = $conn->prepare("UPDATE stocks SET product_id = :product_id, quantity = :quantity, purchasing_price = :purchasing_price, expiry_date = :expiry_date, added_by_id = :added_by_id, status_id = :status_id WHERE id = :id");
         $stmt->bindParam(':id', $data['id']);
-        $stmt->bindParam(':product_name', $product_id);
+        $stmt->bindParam(':product_id', $product_id);
         $stmt->bindParam(':quantity', $data['quantity']);
         $stmt->bindParam(':purchasing_price', $data['purchasing_price']);
         $stmt->bindParam(':expiry_date', $data['expiry_date']);
-        $stmt->bindParam(':added_by', $sold_by_id);
-        $stmt->bindParam(':status', $status_id);
+        $stmt->bindParam(':added_by_id', $sold_by_id);
+        $stmt->bindParam(':status_id', $status_id);
         $stmt->execute();
 
         echo json_encode(['success' => true, 'message' => 'Stock updated successfully!']);

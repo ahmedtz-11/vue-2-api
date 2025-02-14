@@ -35,12 +35,12 @@ if (!empty($data['name']) && !empty($data['category']) && !empty($data['price'])
         }
 
         // Execute the query
-        $stmt = $conn->prepare("INSERT INTO products (name, category, price, description, status) VALUES (:name, :category, :price, :description, :status)");
+        $stmt = $conn->prepare("INSERT INTO products (name, category_id, price, description, status_id) VALUES (:name, :category_id, :price, :description, :status_id)");
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':category', $category_id);
+        $stmt->bindParam(':category_id', $category_id);
         $stmt->bindParam(':price', $data['price']);
         $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':status', $status_id);
+        $stmt->bindParam(':status_id', $status_id);
         $stmt->execute();
         echo json_encode(['message' => 'Product added successfully']);
     } catch (PDOException $e) {

@@ -30,12 +30,12 @@ if (isset($data['username'], $data['password'], $data['role'], $data['status']))
     }
 
     //Execute SQL query
-    $query = "INSERT INTO users (username, password, role, status) VALUES (:username, :password, :role, :status)";
+    $query = "INSERT INTO users (username, password, role, status_id) VALUES (:username, :password, :role, :status_id)";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':username', $data['username']);
     $stmt->bindParam(':password', password_hash($data['password'], PASSWORD_BCRYPT));
     $stmt->bindParam(':role', $data['role']);
-    $stmt->bindParam(':status', $status_id);
+    $stmt->bindParam(':status_id', $status_id);
     
     if ($stmt->execute()) {
         // JSON success when user created

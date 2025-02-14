@@ -48,13 +48,13 @@ if (!empty($data['product_name']) && !empty($data['quantity']) && !empty($data['
         }
 
         // Execute the update query
-        $stmt = $conn->prepare("INSERT INTO stocks (product_name, quantity, purchasing_price, expiry_date, added_by, status) VALUES (:product_name, :quantity, :purchasing_price, :expiry_date, :added_by, :status)");
-        $stmt->bindParam(':product_name', $product_id);
+        $stmt = $conn->prepare("INSERT INTO stocks (product_id, quantity, purchasing_price, expiry_date, added_by_id, status_id) VALUES (:product_id, :quantity, :purchasing_price, :expiry_date, :added_by_id, :status_id)");
+        $stmt->bindParam(':product_id', $product_id);
         $stmt->bindParam(':quantity', $data['quantity']);
         $stmt->bindParam(':purchasing_price', $data['purchasing_price']);
         $stmt->bindParam(':expiry_date', $data['expiry_date']);
-        $stmt->bindParam(':added_by',  $sold_by_id);
-        $stmt->bindParam(':status', $status_id);
+        $stmt->bindParam(':added_by_id',  $sold_by_id);
+        $stmt->bindParam(':status_id', $status_id);
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Stock added successfully']);

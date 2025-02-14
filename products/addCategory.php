@@ -24,9 +24,9 @@ if (!empty($data['name']) && !empty($data['status'])) {
         }
 
         // Execute the query
-        $stmt = $conn->prepare("INSERT INTO categories (name, status) VALUES (:name, :status)");
+        $stmt = $conn->prepare("INSERT INTO categories (name, status_id) VALUES (:name, :status_id)");
         $stmt->bindParam(':name', $data['name']); // Fixed key
-        $stmt->bindParam(':status', $status_id);
+        $stmt->bindParam(':status_id', $status_id);
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'New category added!']);

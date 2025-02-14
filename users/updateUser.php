@@ -29,11 +29,11 @@ if (isset($data['id'], $data['username'], $data['role'], $data['status'])) {
     }
 
     //Execute SQL query
-    $query = "UPDATE users SET username = :username, role = :role, status = :status WHERE id = :id";
+    $query = "UPDATE users SET username = :username, role = :role, status_id = :status_id WHERE id = :id";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':username', $data['username']);
     $stmt->bindParam(':role', $data['role']);
-    $stmt->bindParam(':status', $status_id);
+    $stmt->bindParam(':status_id', $status_id);
     $stmt->bindParam(':id', $data['id']);
     
     if ($stmt->execute()) {

@@ -35,13 +35,13 @@ if (!empty($data['id']) && !empty($data['name']) && !empty($data['category']) &&
         }
 
         // Execute the update query
-        $stmt = $conn->prepare("UPDATE products SET name = :name, category = :category, price = :price, description = :description, status = :status WHERE id = :id");
+        $stmt = $conn->prepare("UPDATE products SET name = :name, category_id = :category_id, price = :price, description = :description, status_id = :status_id WHERE id = :id");
         $stmt->bindParam(':id', $data['id']);
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':category', $category_id);
+        $stmt->bindParam(':category_id', $category_id);
         $stmt->bindParam(':price', $data['price']);
         $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':status', $status_id);
+        $stmt->bindParam(':status_id', $status_id);
         $stmt->execute();
 
         echo json_encode(['success' => true, 'message' => 'Product updated successfully']);
